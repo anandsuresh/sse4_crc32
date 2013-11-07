@@ -11,3 +11,12 @@
 *.lai
 *.la
 *.a
+
+# Node files
+node_modules
+build
+
+# Eclipse files
+.cproject
+.project
+
