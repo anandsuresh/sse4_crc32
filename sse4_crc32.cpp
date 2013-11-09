@@ -5,20 +5,20 @@
 using namespace v8;
 
 extern "C" {
-uint32_t fastcrc(char *str, uint32_t len);
+uint32_t generateCRC32C(char *str, int len);
 }
 
 /**
  * Generates 32-bit CRC
  */
-Handle<Value> GenerateFastCRC32(const Arguments& args) {
+Handle<Value> GenerateCRC32(const Arguments& args) {
     HandleScope scope;
     Local<String> input;
     Local<Integer> output;
 
     // Ensure an argument is passed
     if (args.Length() < 1) {
-        return scope.Close(Undefined());
+        return scope.Close(Integer::New(0));
     }
 
     // Ensure the argument is not an object
@@ -31,7 +31,7 @@ Handle<Value> GenerateFastCRC32(const Arguments& args) {
     input = args[0]->ToString();
 
     // Calculate the 32-bit CRC
-    output = Integer::NewFromUnsigned(fastcrc((char *) *(v8::String::Utf8Value(input)), input->Utf8Length()));
+    output = Integer::NewFromUnsigned(generateCRC32C((char *) *(v8::String::Utf8Value(input)), input->Utf8Length()));
     return scope.Close(output);
 }
 
@@ -39,7 +39,7 @@ Handle<Value> GenerateFastCRC32(const Arguments& args) {
  * Initialize the module
  */
 void init(Handle<Object> target) {
-    target->Set(String::NewSymbol("generateFast"), FunctionTemplate::New(GenerateFastCRC32)->GetFunction());
+    target->Set(String::NewSymbol("generate"), FunctionTemplate::New(GenerateCRC32)->GetFunction());
 }
 
 NODE_MODULE(sse4_crc32, init)
