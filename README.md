@@ -1,4 +1,4 @@
-crc32-sse4
+sse4-crc32
 ==========
 
 CRC32 calculator

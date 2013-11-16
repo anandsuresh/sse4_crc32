@@ -1,0 +1,39 @@
+{
+    "name":            "sse4_crc32",
+    "description":     "A CRC32 generator using Intel's Streaming SIMD Extensions 4.2",
+    "keywords":        [
+        "crc",
+        "crc32",
+        "crc32c",
+        "sse",
+        "sse4",
+        "sse4.2",
+        "error detection",
+        "error correction"
+    ],
+    "version":         "1.0.0",
+    "author":          "Anand Suresh <anandsuresh@gmail.com> (https://github.com/anandsuresh)",
+    "licenses":        [
+        {
+            "type": "MIT"
+        }
+    ],
+    "repository":      {
+        "type": "git",
+        "url":  "https://github.com/anandsuresh/sse4_crc32"
+    },
+    "bugs":            {
+        "url": "https://github.com/anandsuresh/sse4_crc32/issues"
+    },
+    "engines":         {
+        "node": ">=0.8.16"
+    },
+    "main":            "./sse4_crc32",
+    "dependencies":    {
+        "bindings": "1.0.0"
+    },
+    "devDependencies": {
+        "tap":   ">=0.4.0",
+        "crc32": ">=0.2.1"
+    }
+}
