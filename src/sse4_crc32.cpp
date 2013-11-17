@@ -1,6 +1,14 @@
+/**
+ * @file crc32.c
+ * @brief CRC32 calculator based on Intel's Streaming SIMD Extensions 4.2
+ *
+ * Provides a binding between Javascript and the C implementation of the CRC32 function.
+ *
+ * @author Anand Suresh <anandsuresh@gmail.com>
+ */
+
 #include <node.h>
 #include <v8.h>
-#include <stdio.h>
 
 using namespace v8;
 
@@ -11,7 +19,7 @@ uint32_t generateCRC32C(char *str, int len);
 /**
  * Generates 32-bit CRC
  */
-Handle<Value> GenerateCRC32(const Arguments& args) {
+Handle<Value> calculateCRC32(const Arguments& args) {
     HandleScope scope;
     Local<String> input;
     Local<Integer> output;
@@ -31,7 +39,8 @@ Handle<Value> GenerateCRC32(const Arguments& args) {
     input = args[0]->ToString();
 
     // Calculate the 32-bit CRC
-    output = Integer::NewFromUnsigned(generateCRC32C((char *) *(v8::String::Utf8Value(input)), input->Utf8Length()));
+    output = Integer::NewFromUnsigned(
+            generateCRC32C((char *) *(v8::String::Utf8Value(input)), input->Utf8Length()));
     return scope.Close(output);
 }
 
@@ -39,7 +48,7 @@ Handle<Value> GenerateCRC32(const Arguments& args) {
  * Initialize the module
  */
 void init(Handle<Object> target) {
-    target->Set(String::NewSymbol("generate"), FunctionTemplate::New(GenerateCRC32)->GetFunction());
+    target->Set(String::NewSymbol("calculateCRC32"), FunctionTemplate::New(calculateCRC32)->GetFunction());
 }
 
 NODE_MODULE(sse4_crc32, init)
