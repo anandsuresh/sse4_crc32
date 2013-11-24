@@ -38,11 +38,11 @@
  *
  * @return A 32-bit unsigned integer representing the CRC
  */
-uint32_t generateCRC32C(char *str, int len) {
+uint32_t generateCRC32C(char *str, size_t len) {
     uint32_t crc = 0;
 
     // If the string is empty, return 0
-    if (len < 0) {
+    if (len == 0) {
         return crc;
     }
 
@@ -53,9 +53,9 @@ uint32_t generateCRC32C(char *str, int len) {
     }
 
     // Blast off the CRC32 calculation using the system word size
-    for (; len >= (int) WORD_SIZE; len -= (int) WORD_SIZE, str += (int) WORD_SIZE) {
+    for (; len >= WORD_SIZE; len -= WORD_SIZE, str += WORD_SIZE) {
         crc = calcCRC32C(crc, *(sysint_t *) str);
-        log((int) WORD_SIZE, str, crc);
+        log(WORD_SIZE, str, crc);
     }
 
     // Calculate the CRC for any remaining portions of the string

@@ -3,18 +3,32 @@ var crc32 = require("../sse4_crc32"),
     test = tap.test;
 
 
-var
-TEST_CASES = {
-    "Anand Suresh":       3383959586,
-    "Voxer Inc. rocks!!": 1843917851
-};
+var TEST_CASES = [
+    {
+        input : "Anand Suresh",
+        output: 3383959586
+    },
+    {
+        input : "Voxer Inc. rocks!!",
+        output: 1843917851
+    },
+    {
+        input : new Buffer("Anand Suresh"),
+        output: 3383959586
+    },
+    {
+        input : new Buffer("Voxer Inc. rocks!!"),
+        output: 1843917851
+    }
+];
+
 
 /**
  * Runs basic tests
  */
 test("Basic Tests", function (t) {
-    Object.keys(TEST_CASES).forEach(function (str) {
-        t.equals(crc32.calculateCRC32(str), TEST_CASES[str], "CRC32 for " + str + " should be " + TEST_CASES[str]);
+    TEST_CASES.forEach(function (test_case) {
+        t.equals(crc32.calculateCRC32(test_case.input), test_case.output, "CRC32 for " + test_case.input + " should be " + test_case.output);
     });
     t.end();
 });
