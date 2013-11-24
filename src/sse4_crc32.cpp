@@ -8,12 +8,14 @@
  */
 
 #include <node.h>
+#include <node_buffer.h>
 #include <v8.h>
 
 using namespace v8;
+using namespace node;
 
 extern "C" {
-uint32_t generateCRC32C(char *str, int len);
+    uint32_t generateCRC32C(char *str, size_t len);
 }
 
 /**
@@ -21,7 +23,6 @@ uint32_t generateCRC32C(char *str, int len);
  */
 Handle<Value> calculateCRC32(const Arguments& args) {
     HandleScope scope;
-    Local<String> input;
     Local<Integer> output;
 
     // Ensure an argument is passed
@@ -29,18 +30,20 @@ Handle<Value> calculateCRC32(const Arguments& args) {
         return scope.Close(Integer::New(0));
     }
 
-    // Ensure the argument is not an object
-    if (args[0]->IsObject()) {
+    // Ensure the argument is a buffer or a string
+    if (Buffer::HasInstance(args[0])) {
+        Local<Object> input = args[0]->ToObject();
+        output = Integer::NewFromUnsigned(generateCRC32C(Buffer::Data(input), Buffer::Length(input)));
+    } else if (args[0]->IsObject()) {
         ThrowException(Exception::TypeError(String::New("Cannot compute CRC-32 for objects!")));
         return scope.Close(Undefined());
+    } else {
+        Local<String> strInput = args[0]->ToString();
+        output = Integer::NewFromUnsigned(
+                generateCRC32C((char *) *(String::Utf8Value(strInput)), strInput->Utf8Length()));
     }
 
-    // Convert the argument into a string
-    input = args[0]->ToString();
-
     // Calculate the 32-bit CRC
-    output = Integer::NewFromUnsigned(
-            generateCRC32C((char *) *(v8::String::Utf8Value(input)), input->Utf8Length()));
     return scope.Close(output);
 }
 
