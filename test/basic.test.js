@@ -1,24 +1,20 @@
-var crc32 = require("../sse4_crc32"),
+var SSE4CRC32 = require("../sse4_crc32"),
     tap = require("tap"),
     test = tap.test;
 
 
 var TEST_CASES = [
     {
-        input : "Anand Suresh",
-        output: 3383959586
+        input : "SSE4-CRC32: A hardware accelerated CRC32 implementation for node.js",
+        output: 478148685
     },
     {
-        input : "Voxer Inc. rocks!!",
-        output: 1843917851
+        input : new Buffer("SSE4-CRC32: A hardware accelerated CRC32 implementation for node.js"),
+        output: 478148685
     },
     {
-        input : new Buffer("Anand Suresh"),
-        output: 3383959586
-    },
-    {
-        input : new Buffer("Voxer Inc. rocks!!"),
-        output: 1843917851
+        input : [ "SSE4-CRC32: ", "A hardware accelerated CRC32 implementation ", "for node.js" ],
+        output: 478148685
     }
 ];
 
@@ -28,7 +24,15 @@ var TEST_CASES = [
  */
 test("Basic Tests", function (t) {
     TEST_CASES.forEach(function (test_case) {
-        t.equals(crc32.calculateCRC32(test_case.input), test_case.output, "CRC32 for " + test_case.input + " should be " + test_case.output);
+        if (Array.isArray(test_case.input)) {
+            var test_crc = new SSE4CRC32.CRC32();
+            test_case.input.forEach(function (str) {
+                test_crc.update(str);
+            });
+            t.equals(test_crc.crc(), test_case.output, "CRC32 for [ " + test_case.input + " ] should be " + test_case.output);
+        } else {
+            t.equals(SSE4CRC32.calculate(test_case.input), test_case.output, "CRC32 for " + test_case.input + " should be " + test_case.output);
+        }
     });
     t.end();
 });

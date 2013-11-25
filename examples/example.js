@@ -1,10 +1,26 @@
 /**
  * @file example.js
  * @brief Example code using the CRC32 functions
- * 
+ *
  * @author Anand Suresh <anandsuresh@gmail.com>
  */
-var myaddon = require("../sse4_crc32"), str1 = "Anand Suresh", str2 = "Voxer Inc. rocks!!";
+var SSE4CRC32 = require("../sse4_crc32");
 
-console.log("calculateCRC32(\"" + str1 + "\") = " + myaddon.calculateCRC32(str1));
-console.log("calculateCRC32(\"" + str2 + "\") = " + myaddon.calculateCRC32(str2));
+
+// Usage for calculating CRC32 for strings
+var str = "SSE4-CRC32: A hardware accelerated CRC32 implementation for node.js";
+console.log("crc(\"" + str + "\") = " + SSE4CRC32.calculate(str));
+
+
+// Usage for calculating CRC32 for buffers
+var buf = new Buffer("SSE4-CRC32: A hardware accelerated CRC32 implementation for node.js");
+console.log("crc(\"" + buf + "\") = " + SSE4CRC32.calculate(str));
+
+
+// Usage for calculating progressive CRC32
+var crc32 = new SSE4CRC32.CRC32(),
+    array = [ "SSE4-CRC32: ", "A hardware accelerated CRC32 implementation ", "for node.js" ];
+array.forEach(function (str) {
+    crc32.update(str);
+});
+console.log("crc([" + array + "]) = " + crc32.crc());

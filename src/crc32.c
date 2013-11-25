@@ -28,51 +28,51 @@
 // Debug support
 #ifdef DEBUG
 # include <stdio.h>
-# define log(len, ptr, crc) printf("Speed: %d bytes\tptr: %p\tcrc: 0x%9x\tstr: %s\n", len, ptr, crc, ptr)
+# define log(...)              printf(__VA_ARGS__)
+# define log_op(len, ptr, crc) log("Speed: %lu bytes\tptr: %p\tcrc: 0x%9x\tstr: %s\n", (size_t)len, ptr, crc, ptr)
 #else
-# define log(len, ptr, crc)
+# define log(...)
+# define log_op(len, ptr, crc)
 #endif
 
 /**
- * Generates 32-bit CRC for the specified input string
+ * Calculates 32-bit CRC for the specified input string
  *
  * @return A 32-bit unsigned integer representing the CRC
  */
-uint32_t generateCRC32C(char *str, size_t len) {
-    uint32_t crc = 0;
-
+uint32_t calculateCRC32C(uint32_t initial_crc, char *str, size_t len) {
     // If the string is empty, return 0
     if (len == 0) {
-        return crc;
+        return initial_crc;
     }
 
     // Align the input to the word boundary
     for (; (len > 0) && ((sysint_t) str & ALIGNMENT_MASK); len--, str++) {
-        crc = _mm_crc32_u8(crc, *str);
-        log(1, str, crc);
+        initial_crc = _mm_crc32_u8(initial_crc, *str);
+        log_op(1, str, initial_crc);
     }
 
     // Blast off the CRC32 calculation using the system word size
     for (; len >= WORD_SIZE; len -= WORD_SIZE, str += WORD_SIZE) {
-        crc = calcCRC32C(crc, *(sysint_t *) str);
-        log(WORD_SIZE, str, crc);
+        initial_crc = calcCRC32C(initial_crc, *(sysint_t *) str);
+        log_op(WORD_SIZE, str, initial_crc);
     }
 
     // Calculate the CRC for any remaining portions of the string
     for (; len >= 4; len -= 4, str += 4) {                           // Only used for 64-bit systems
-        crc = _mm_crc32_u32(crc, *(uint32_t *) str);
-        log(4, str, crc);
+        initial_crc = _mm_crc32_u32(initial_crc, *(uint32_t *) str);
+        log_op(4, str, initial_crc);
     }
 
     for (; len >= 2; len -= 2, str += 2) {
-        crc = _mm_crc32_u16(crc, *(uint16_t *) str);
-        log(2, str, crc);
+        initial_crc = _mm_crc32_u16(initial_crc, *(uint16_t *) str);
+        log_op(2, str, initial_crc);
     }
 
     if (len > 0) {
-        crc = _mm_crc32_u8(crc, *str);
-        log(1, str, crc);
+        initial_crc = _mm_crc32_u8(initial_crc, *str);
+        log_op(1, str, initial_crc);
     }
 
-    return crc;
+    return initial_crc;
 }
