@@ -20,19 +20,21 @@ Using the library is quite simple. Start out by including the library in your co
 
 To calculate the 32-bit CRC for any string, simply use the following code:
 
-	var my_crc = SSE4CRC32.calculate("my string");
+	var crc = SSE4CRC32.calculate("my string");
 
 Instead of passing in a string, a buffer can be passed to the `calculate()` function.
 
 To calculate CRC in a progressive manner, use the code snippet:
 
-	var crc = new SSE4CRC32.CRC32(),
+	var SSE4CRC32 = new SSE4CRC32.CRC32(),
 		my_inputs = [ "some string", new Buffer("a buffer"), "yet another string", new Buffer("yet another buffer") ],
-		my_crc;
+		crc;
 
 	my_inputs.forEach(function (string) {
-		my_crc = crc.update(string);
+		SSE4CRC32.update(string);
 	});
+
+	crc = SSE4CRC32.crc();
 
 Also see the example code in the [examples](https://github.com/anandsuresh/sse4_crc32/tree/master/examples)
  directory.
