@@ -8,10 +8,9 @@
         "sse",
         "sse4",
         "sse4.2",
-        "error detection",
-        "error correction"
+        "error detection"
     ],
-    "version":         "1.1.0",
+    "version":         "1.1.1",
     "author":          "Anand Suresh <anandsuresh@gmail.com> (https://github.com/anandsuresh)",
     "licenses":        [
         {

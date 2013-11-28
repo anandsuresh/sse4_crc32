@@ -16,7 +16,7 @@ debug: clean
 		node-gyp configure -d build
 
 test: build
-		tap $(TEST_FILES)
+		./node_modules/.bin/tap $(TEST_FILES)
 
 benchmark: build
 		for f in $(BENCHMARK_FILES); do node $$f; done;
