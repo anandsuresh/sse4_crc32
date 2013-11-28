@@ -31,10 +31,10 @@ To calculate CRC in a progressive manner, use the code snippet:
 		crc;
 
 	my_inputs.forEach(function (string) {
-		SSE4CRC32.update(string);
+		crc = SSE4CRC32.update(string);
 	});
 
-	crc = SSE4CRC32.crc();
+	crc = SSE4CRC32.crc();				// The .crc() method can also be used to get the final CRC
 
 Also see the example code in the [examples](https://github.com/anandsuresh/sse4_crc32/tree/master/examples)
  directory.

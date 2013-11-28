@@ -24,6 +24,7 @@ function CRC32(input, initial_crc) {
  */
 CRC32.prototype.update = function (input) {
     this.crc32 = sse4_crc32.calculate(input, this.crc32);
+    return this.crc32;
 };
 
 /**
