@@ -1,4 +1,5 @@
 TEST_FILES = test/*.test.js
+BENCHMARK_FILES = benchmark/*.benchmark.js
 
 all: test
 
@@ -16,6 +17,9 @@ debug: clean
 
 test: build
 		tap $(TEST_FILES)
+
+benchmark: build
+		for f in $(BENCHMARK_FILES); do node $$f; done;
 
 clean:
 		node-gyp clean
