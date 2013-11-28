@@ -1,9 +1,3 @@
-/**
- * @file example.js
- * @brief Example code using the CRC32 functions
- *
- * @author Anand Suresh <anandsuresh@gmail.com>
- */
 var SSE4CRC32 = require("../sse4_crc32");
 
 
@@ -14,7 +8,7 @@ console.log("crc(\"" + str + "\") = " + SSE4CRC32.calculate(str));
 
 // Usage for calculating CRC32 for buffers
 var buf = new Buffer("SSE4-CRC32: A hardware accelerated CRC32 implementation for node.js");
-console.log("crc(\"" + buf + "\") = " + SSE4CRC32.calculate(str));
+console.log("crc(\"" + buf + "\") = " + SSE4CRC32.calculate(buf));
 
 
 // Usage for calculating progressive CRC32
