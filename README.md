@@ -12,6 +12,13 @@ instruction set to provide a fast CRC-32 algorithm.
 - Supports Node.js buffers
 
 
+## Installation
+
+Use the following command to install the library from npm:
+
+	npm install sse4_crc32
+
+
 ## Usage
 
 Using the library is quite simple. Start out by including the library in your code:
