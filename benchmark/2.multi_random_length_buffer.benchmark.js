@@ -11,7 +11,7 @@ var MAX_STRING_LENGTH = 4096,
 
 
 // Generate random strings
-console.log(INVOCATIONS + " invocations of CRC32 on random length buffers upto " + MAX_STRING_LENGTH + " bytes long...");
+console.log(INVOCATIONS + " calls to calculate CRC on random length buffers upto " + MAX_STRING_LENGTH + " bytes long...");
 for (var i = 0; i < INVOCATIONS; i++) {
     var len = Math.random() * MAX_STRING_LENGTH,
         str = "";
