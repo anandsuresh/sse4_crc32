@@ -12,6 +12,31 @@ instruction set to provide a fast CRC-32 algorithm.
 - Supports Node.js buffers
 
 
+## Performance
+
+The tests were run on a Macbook Air running an Intel Core i7 processor, with 8GB
+of RAM and used buffers instead of strings to prevent having items on the V8
+heap that might cause the garbage collector to fire frequently and interfere
+with the test run-times.
+
+Below are the results from the 2 test cases:
+
+    >node benchmark/1.single_1kb_length_buffer.benchmark.js
+    100000 calls to calculate CRC on a 1024 byte buffer...
+            SSE4.2 based CRC32: 26ms.
+            Pure JS based CRC32 (table-based): 699ms.
+            Pure JS based CRC32 (direct): 3704ms.
+
+    >node benchmark/2.multi_random_length_buffer.benchmark.js
+    100000 calls to calculate CRC on random length buffers upto 4096 bytes long...
+            Avg. buffer length: 2042 bytes
+            SSE4.2 based CRC32: 62ms.
+            Pure JS based CRC32 (table-based): 1968ms.
+            Pure JS based CRC32 (direct): 8220ms.
+
+As you can see, the SSE4_CRC32 library is about **31.74** times faster than the pure JS library!
+
+
 ## Installation
 
 Use the following command to install the library from npm:
