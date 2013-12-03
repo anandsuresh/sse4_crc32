@@ -29,10 +29,14 @@
     },
     "main":            "./sse4_crc32",
     "dependencies":    {
-        "bindings": "1.0.0"
+        "bindings": "~1.1.1",
+        "nan":      "~0.6.0"
     },
     "devDependencies": {
         "tap":   ">=0.4.0",
         "crc32": ">=0.2.1"
+    },
+    "scripts":          {
+        "test": "tap test/*test.js"
     }
 }

@@ -7,6 +7,9 @@
                 "src/sse4_crc32.cpp",
                 "src/crc32.c"
             ],
+            "include_dirs" : [
+                "<!(node -e \"require('nan')\")"
+            ],
             "xcode_settings": {
                 "GCC_ENABLE_SSE42_EXTENSIONS": "YES"
             },

@@ -7,9 +7,7 @@
  * @author Anand Suresh <anandsuresh@gmail.com>
  */
 
-#include <node.h>
-#include <node_buffer.h>
-#include <v8.h>
+#include <nan.h>
 
 using namespace v8;
 using namespace node;
@@ -21,24 +19,24 @@ uint32_t calculateCRC32C(uint32_t initial_crc, char *str, size_t len);
 /**
  * Generates 32-bit CRC
  */
-Handle<Value> calculate(const Arguments& args) {
-    HandleScope scope;
+NAN_METHOD(calculate) {
+    NanScope();
     uint32_t init_crc;
     uint32_t crc;
 
     // Ensure an argument is passed
     if (args.Length() < 1) {
-        return scope.Close(Integer::New(0));
+        NanReturnValue(Integer::New(0));
     } else if (args.Length() > 2) {
-        ThrowException(Exception::TypeError(String::New("Invalid number of arguments!")));
-        return scope.Close(Undefined());
+        NanThrowTypeError("Invalid number of arguments!");
+        NanReturnUndefined();
     }
 
     // Check for any initial CRC passed to the function
     if (args.Length() > 1) {
         if (!(args[1]->IsUint32())) {
-            ThrowException(Exception::TypeError(String::New("Initial CRC32 must be an integer value!")));
-            return scope.Close(Undefined());
+            NanThrowTypeError("Initial CRC32 must be an integer value!");
+            NanReturnUndefined();
         }
 
         init_crc = args[1]->Uint32Value();
@@ -51,22 +49,22 @@ Handle<Value> calculate(const Arguments& args) {
         Local<Object> buf = args[0]->ToObject();
         crc = calculateCRC32C(init_crc, (char *) Buffer::Data(buf), (size_t) Buffer::Length(buf));
     } else if (args[0]->IsObject()) {
-        ThrowException(Exception::TypeError(String::New("Cannot compute CRC-32 for objects!")));
-        return scope.Close(Undefined());
+        NanThrowTypeError("Cannot compute CRC-32 for objects!");
+        NanReturnUndefined();
     } else {
         Local<String> strInput = args[0]->ToString();
         crc = calculateCRC32C(init_crc, (char *) *String::Utf8Value(strInput), (size_t) strInput->Utf8Length());
     }
 
     // Calculate the 32-bit CRC
-    return scope.Close(Integer::NewFromUnsigned(crc));
+    NanReturnValue(Integer::NewFromUnsigned(crc));
 }
 
 /**
  * Initialize the module
  */
 void init(Handle<Object> target) {
-    target->Set(String::NewSymbol("calculate"), FunctionTemplate::New(calculate)->GetFunction());
+    target->Set(NanSymbol("calculate"), FunctionTemplate::New(calculate)->GetFunction());
 }
 
 NODE_MODULE(sse4_crc32, init)
