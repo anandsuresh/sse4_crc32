@@ -24,8 +24,7 @@ uint32_t calculateCRC32C(uint32_t initial_crc, char *str, size_t len);
 Handle<Value> calculate(const Arguments& args) {
     HandleScope scope;
     uint32_t init_crc;
-    char *str = NULL;
-    size_t len = 0;
+    uint32_t crc;
 
     // Ensure an argument is passed
     if (args.Length() < 1) {
@@ -33,20 +32,6 @@ Handle<Value> calculate(const Arguments& args) {
     } else if (args.Length() > 2) {
         ThrowException(Exception::TypeError(String::New("Invalid number of arguments!")));
         return scope.Close(Undefined());
-    }
-
-    // Ensure the argument is a buffer or a string
-    if (Buffer::HasInstance(args[0])) {
-        Local<Object> buf = args[0]->ToObject();
-        str = Buffer::Data(buf);
-        len = (size_t) Buffer::Length(buf);
-    } else if (args[0]->IsObject()) {
-        ThrowException(Exception::TypeError(String::New("Cannot compute CRC-32 for objects!")));
-        return scope.Close(Undefined());
-    } else {
-        Local<String> strInput = args[0]->ToString();
-        str = (char *) *(String::Utf8Value(strInput));
-        len = (size_t) strInput->Utf8Length();
     }
 
     // Check for any initial CRC passed to the function
@@ -61,8 +46,20 @@ Handle<Value> calculate(const Arguments& args) {
         init_crc = 0;
     }
 
+    // Ensure the argument is a buffer or a string
+    if (Buffer::HasInstance(args[0])) {
+        Local<Object> buf = args[0]->ToObject();
+        crc = calculateCRC32C(init_crc, (char *) Buffer::Data(buf), (size_t) Buffer::Length(buf));
+    } else if (args[0]->IsObject()) {
+        ThrowException(Exception::TypeError(String::New("Cannot compute CRC-32 for objects!")));
+        return scope.Close(Undefined());
+    } else {
+        Local<String> strInput = args[0]->ToString();
+        crc = calculateCRC32C(init_crc, (char *) *String::Utf8Value(strInput), (size_t) strInput->Utf8Length());
+    }
+
     // Calculate the 32-bit CRC
-    return scope.Close(Integer::NewFromUnsigned(calculateCRC32C(init_crc, str, len)));
+    return scope.Close(Integer::NewFromUnsigned(crc));
 }
 
 /**
