@@ -1,6 +1,6 @@
 # SSE4-CRC32
 
-Nehalam-based Intel processors feature the Streaming SIMD Extensions instruction set which provide a
+Starting with the Nehalam series, Intel processors feature the Streaming SIMD Extensions instruction set which provide a
 hardware-accelerated version of the CRC32 algorithm (Castagnoli variant). This library uses the Intel SSE 4.2
 instruction set to provide a fast CRC-32 algorithm.
 
