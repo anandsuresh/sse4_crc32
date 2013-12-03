@@ -59,10 +59,13 @@ uint32_t calculateCRC32C(uint32_t initial_crc, char *str, size_t len) {
     }
 
     // Calculate the CRC for any remaining portions of the string
+    
+#ifdef __x86_64__
     for (; len >= 4; len -= 4, str += 4) {                           // Only used for 64-bit systems
         initial_crc = _mm_crc32_u32(initial_crc, *(uint32_t *) str);
         log_op(4, str, initial_crc);
     }
+#endif 
 
     for (; len >= 2; len -= 2, str += 2) {
         initial_crc = _mm_crc32_u16(initial_crc, *(uint16_t *) str);
