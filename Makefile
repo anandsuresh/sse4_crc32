@@ -1,3 +1,5 @@
+NODE_GYP = ./node_modules/.bin/node-gyp
+TAP = ./node_modules/.bin/tap
 TEST_FILES = test/*.test.js
 BENCHMARK_FILES = benchmark/*.benchmark.js
 
@@ -6,23 +8,23 @@ all: test
 build: clean configure compile
 
 configure:
-		node-gyp configure
+		$(NODE_GYP) configure
 
 compile: configure
-		node-gyp build
+		$(NODE_GYP) build
 		npm install .
 
 debug: clean
-		node-gyp configure -d build
+		$(NODE_GYP) configure -d build
 
 test: build
-		./node_modules/.bin/tap $(TEST_FILES)
+		$(TAP) $(TEST_FILES)
 
 benchmark: build
 		for f in $(BENCHMARK_FILES); do node $$f; done;
 
 clean:
-		node-gyp clean
+		$(NODE_GYP) clean
 
 
 .PHONY: clean test build

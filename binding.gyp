@@ -5,7 +5,7 @@
             "target_name":    "sse4_crc32",
             "sources":        [
                 "src/sse4_crc32.cpp",
-                "src/crc32.c"
+                "src/crc32c.c"
             ],
             "include_dirs" : [
                 "<!(node -e \"require('nan')\")"

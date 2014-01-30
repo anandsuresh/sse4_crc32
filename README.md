@@ -1,13 +1,15 @@
 # SSE4-CRC32
 
-Starting with the Nehalam series, Intel processors feature the Streaming SIMD Extensions instruction set which provide a
-hardware-accelerated version of the CRC32 algorithm (Castagnoli variant). This library uses the Intel SSE 4.2
+Starting with the Nehalam series, Intel processors feature the Streaming SIMD
+Extensions instruction set which provide a hardware-accelerated version of
+the CRC32 algorithm (Castagnoli variant). This library uses the Intel SSE 4.2
 instruction set to provide a fast CRC-32 algorithm.
 
 
 ## Features
 
-- Intel Streaming SIMD Extensions 4.2 based hardware accelerated CRC 32 calculation
+- Intel Streaming SIMD Extensions 4.2 based hardware accelerated CRC 32
+calculation
 - Progressive CRC32 calculation
 - Supports Node.js buffers
 
@@ -34,7 +36,8 @@ Below are the results from the 2 test cases:
             Pure JS based CRC32 (table-based): 1968ms.
             Pure JS based CRC32 (direct): 8220ms.
 
-As you can see, the SSE4_CRC32 library is about **31.74** times faster than the pure JS library!
+The results clearly show that the SSE4_CRC32 library is about **31.74** times
+faster than the pure JS library!
 
 
 ## Installation
@@ -58,15 +61,15 @@ Instead of passing in a string, a buffer can be passed to the `calculate()` func
 
 To calculate CRC in a progressive manner, use the code snippet:
 
-	var SSE4CRC32 = new SSE4CRC32.CRC32(),
+	var sse4crc32 = new SSE4CRC32.CRC32(),
 		my_inputs = [ "some string", new Buffer("a buffer"), "yet another string", new Buffer("yet another buffer") ],
 		crc;
 
 	my_inputs.forEach(function (string) {
-		crc = SSE4CRC32.update(string);
+		crc = sse4crc32.update(string);
 	});
 
-	crc = SSE4CRC32.crc();				// The .crc() method can also be used to get the final CRC
+	crc = sse4crc32.crc();				// The .crc() method can also be used to get the final CRC
 
 Also see the example code in the [examples](https://github.com/anandsuresh/sse4_crc32/tree/master/examples)
  directory.

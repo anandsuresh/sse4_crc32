@@ -2,19 +2,23 @@
  * @file crc32.c
  * @brief CRC32 calculator based on Intel's Streaming SIMD Extensions 4.2
  *
- * Provides a binding between Javascript and the C implementation of the CRC32 function.
+ * Provides a binding between Javascript and the C implementation of the CRC32
+ * function.
  *
  * @author Anand Suresh <anandsuresh@gmail.com>
  */
 
 #include <nan.h>
 
+
 using namespace v8;
 using namespace node;
 
+
 extern "C" {
-uint32_t calculateCRC32C(uint32_t initial_crc, char *str, size_t len);
+    uint32_t calculateCRC32C(uint32_t initial_crc, char *str, size_t len);
 }
+
 
 /**
  * Generates 32-bit CRC
@@ -60,11 +64,13 @@ NAN_METHOD(calculate) {
     NanReturnValue(Integer::NewFromUnsigned(crc));
 }
 
+
 /**
  * Initialize the module
  */
 void init(Handle<Object> target) {
     target->Set(NanSymbol("calculate"), FunctionTemplate::New(calculate)->GetFunction());
 }
+
 
 NODE_MODULE(sse4_crc32, init)

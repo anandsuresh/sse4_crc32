@@ -6,15 +6,15 @@ var SSE4CRC32 = require("../sse4_crc32"),
 var TEST_CASES = [
     {
         input : "SSE4-CRC32: A hardware accelerated CRC32 implementation for node.js",
-        output: 478148685
+        output: 3039989317
     },
     {
         input : new Buffer("SSE4-CRC32: A hardware accelerated CRC32 implementation for node.js"),
-        output: 478148685
+        output: 3039989317
     },
     {
         input : [ "SSE4-CRC32: ", "A hardware accelerated CRC32 implementation ", "for node.js" ],
-        output: 478148685
+        output: 3039989317
     }
 ];
 
