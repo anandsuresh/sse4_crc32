@@ -16,7 +16,7 @@ using namespace node;
 
 
 extern "C" {
-    uint32_t calculateCRC32C(uint32_t initial_crc, char *str, size_t len);
+    uint32_t crc32c(uint32_t initial_crc, char *str, size_t len);
 }
 
 
@@ -51,13 +51,13 @@ NAN_METHOD(calculate) {
     // Ensure the argument is a buffer or a string
     if (Buffer::HasInstance(args[0])) {
         Local<Object> buf = args[0]->ToObject();
-        crc = calculateCRC32C(init_crc, (char *) Buffer::Data(buf), (size_t) Buffer::Length(buf));
+        crc = crc32c(init_crc, (char *) Buffer::Data(buf), (size_t) Buffer::Length(buf));
     } else if (args[0]->IsObject()) {
         NanThrowTypeError("Cannot compute CRC-32 for objects!");
         NanReturnUndefined();
     } else {
         Local<String> strInput = args[0]->ToString();
-        crc = calculateCRC32C(init_crc, (char *) *String::Utf8Value(strInput), (size_t) strInput->Utf8Length());
+        crc = crc32c(init_crc, (char *) *String::Utf8Value(strInput), (size_t) strInput->Utf8Length());
     }
 
     // Calculate the 32-bit CRC
