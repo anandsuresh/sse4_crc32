@@ -1,6 +1,8 @@
 /* crc32c.c -- compute CRC-32C using the Intel crc32 instruction
  * Copyright (C) 2013 Mark Adler
- * Version 1.1  1 Aug 2013  Mark Adler
+ * Based on version 1.1  1 Aug 2013  Mark Adler
+ * Version 1.2  6 Feb 2014  Urban Škudnik - Hard-coded crc32c_table
+ * URL: http://stackoverflow.com/questions/17645167/implementing-sse-4-2s-crc32c-in-software/17646775#17646775
  */
 
 /*
@@ -22,6 +24,9 @@
 
   Mark Adler
   madler@alumni.caltech.edu
+  
+  Urban Škudnik
+  urban.skudnik@gmail.com
  */
 
 /* Use hardware CRC instruction on Intel SSE 4.2 processors.  This computes a
@@ -31,6 +36,7 @@
 /* Version history:
    1.0  10 Feb 2013  First version
    1.1   1 Aug 2013  Correct comments on why three crc instructions in parallel
+   1.2   6 Feb 2014  Hard-coded crc32c_table
  */
 
 #include <stdio.h>
