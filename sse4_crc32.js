@@ -41,11 +41,12 @@ CRC32.prototype.crc = function () {
  * Used to calculate 32-bit CRC for single instances of strings and/or buffers
  *
  * @param input The input string for which the CRC is to be calculated
+ * @param initial_crc The initial CRC passed in [optional]
  *
  * @returns {Integer}
  */
-function calculate(input) {
-    return sse4_crc32.calculate(input, 0);
+function calculate(input, initial_crc) {
+    return sse4_crc32.calculate(input, initial_crc || 0);
 }
 
 
