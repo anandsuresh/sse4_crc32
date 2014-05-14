@@ -30,8 +30,7 @@
     "main":            "./sse4_crc32",
     "dependencies":    {
         "bindings": "~1.1.1",
-        "nan":      "~0.6.0",
-        "node-gyp": "~0.12.2"
+        "nan":      "~0.6.0"
     },
     "devDependencies": {
         "tap":   ">=0.4.0",
