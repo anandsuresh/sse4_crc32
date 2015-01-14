@@ -30,7 +30,7 @@ NAN_METHOD(calculate) {
 
     // Ensure an argument is passed
     if (args.Length() < 1) {
-        NanReturnValue(Integer::New(0));
+        NanReturnValue(NanNew<Integer>(0));
     } else if (args.Length() > 2) {
         NanThrowTypeError("Invalid number of arguments!");
         NanReturnUndefined();
@@ -61,7 +61,7 @@ NAN_METHOD(calculate) {
     }
 
     // Calculate the 32-bit CRC
-    NanReturnValue(Integer::NewFromUnsigned(crc));
+    NanReturnValue(NanNew<Uint32>(crc));
 }
 
 
@@ -69,7 +69,7 @@ NAN_METHOD(calculate) {
  * Initialize the module
  */
 void init(Handle<Object> target) {
-    target->Set(NanSymbol("calculate"), FunctionTemplate::New(calculate)->GetFunction());
+    NODE_SET_METHOD(target, "calculate", calculate);
 }
 
 
