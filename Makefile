@@ -1,4 +1,4 @@
-NODE_GYP = node-gyp
+NODE_GYP = ./node_modules/.bin/node-gyp
 TAP = ./node_modules/.bin/tap
 TEST_FILES = test/*.test.js
 BENCHMARK_FILES = benchmark/*.benchmark.js
@@ -24,7 +24,7 @@ benchmark: build
 		for f in $(BENCHMARK_FILES); do node $$f; done;
 
 clean:
-		$(NODE_GYP) clean
+		-$(NODE_GYP) clean
 
 
 .PHONY: clean build test
