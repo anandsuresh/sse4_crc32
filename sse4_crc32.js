@@ -4,9 +4,8 @@ var sse4_crc32 = require("bindings")("sse4_crc32");
 /**
  * Defines a progressive 32-bit CRC calculator
  *
- * @param input The input string for which the CRC is to be calculated
- * @param initial_crc The initial CRC passed in [optional]
- *
+ * @param {String|Buffer} input The input string for which the CRC is to be calculated
+ * @param {Number} [initial_crc] The initial CRC passed in
  * @constructor
  */
 function CRC32(input, initial_crc) {
@@ -40,14 +39,15 @@ CRC32.prototype.crc = function () {
 /**
  * Used to calculate 32-bit CRC for single instances of strings and/or buffers
  *
- * @param input The input string for which the CRC is to be calculated
- * @param initial_crc The initial CRC passed in [optional]
+ * @param {String|Buffer} input The input string for which the CRC is to be calculated
+ * @param {Number} [initial_crc] The initial CRC passed in
  *
  * @returns {Integer}
  */
 function calculate(input, initial_crc) {
     return sse4_crc32.calculate(input, initial_crc || 0);
 }
+
 
 
 module.exports = {

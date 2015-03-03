@@ -59,7 +59,13 @@ To calculate the 32-bit CRC for any string, simply use the following code:
 
 Instead of passing in a string, a buffer can be passed to the `calculate()` function.
 
-To calculate CRC in a progressive manner, use the code snippet:
+Furthermore, the `calculate()` function takes an optional `initial_crc` value as the second argument, allowing
+for progressive CRC calculation.
+
+	var crc = SSE4CRC32.calculate("my string");
+	var new_crc = SSE4CRC32.calculate("my new string", crc);
+
+Another way to calculate CRC in a progressive manner is as follows:
 
 	var sse4crc32 = new SSE4CRC32.CRC32(),
 		my_inputs = [ "some string", new Buffer("a buffer"), "yet another string", new Buffer("yet another buffer") ],
