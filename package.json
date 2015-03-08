@@ -10,13 +10,9 @@
         "sse4.2",
         "error detection"
     ],
-    "version":         "2.1.2",
+    "version":         "3.0.0",
     "author":          "Anand Suresh <anandsuresh@gmail.com> (https://github.com/anandsuresh)",
-    "licenses":        [
-        {
-            "type": "MIT"
-        }
-    ],
+    "license":"MIT",
     "repository":      {
         "type": "git",
         "url":  "https://github.com/anandsuresh/sse4_crc32"
@@ -31,7 +27,7 @@
     "dependencies":    {
         "node-gyp": "^1.0.2",
         "bindings": "~1.2.1",
-        "nan":      "^1.6.0"
+        "nan":      "^1.7.0"
     },
     "devDependencies": {
         "tap":   ">=0.4.0",
