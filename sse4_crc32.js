@@ -6,8 +6,8 @@
  * @license MIT
  */
 var Sse4Crc32 = require("bindings")("sse4_crc32");
-
-
+var isHardwareSupported = Sse4Crc32.isHardWareCrcSupported;
+var calculate = isHardwareSupported ? hwCrc32c : swCrc32c;
 
 /**
  * Calculates CRC in software mode
@@ -28,28 +28,11 @@ function swCrc32c(input, initialCrc) {
  * @param {Number} [initialCrc=0] An optional initial CRC
  * @returns {Number}
  */
-function hwCrc32c(input, initialCrc) {
-    if (!Sse4Crc32.isHardwareCrcSupported) throw new Error('Hardware CRC-32C not supported!');
-
+var hwCrc32c = isHardwareSupported ? function(input, initialCrc) {
     return Sse4Crc32.hwCrc(input, initialCrc || 0);
+} : function() {
+    throw new Error('Hardware CRC-32C not supported!');
 }
-
-
-/**
- * Used to calculate 32-bit CRC for single instances of strings and/or buffers
- *
- * This function automatically determines the best mode of operation (h/w vs. s/w implementation).
- *
- * @param {String|Buffer} input The input string for which the CRC is to be calculated
- * @param {Number} [initialCrc=0] An optional initial CRC
- * @returns {Number}
- */
-function calculate(input, initialCrc) {
-    var crcFunction = Sse4Crc32.isHardwareCrcSupported ? Sse4Crc32.hwCrc : Sse4Crc32.swCrc;
-
-    return crcFunction(input, initialCrc || 0);
-}
-
 
 
 /**
@@ -93,7 +76,7 @@ Crc32C.prototype.crc = function() {
  * @type {Object}
  */
 module.exports = {
-    isHardwareCrcSupported: Sse4Crc32.isHardwareCrcSupported,
+    isHardwareCrcSupported: isHardwareSupported,
     calculateInSoftware   : swCrc32c,
     calculateOnHardware   : hwCrc32c,
 
