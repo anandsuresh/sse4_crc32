@@ -82,7 +82,13 @@ bool isSSE42Available() {
 
     return ((edx & SSE4_2_FLAG) == SSE4_2_FLAG);
 #else
-    return false;
+    uint32_t eax, ecx;
+    eax = 1;
+    __asm__("cpuid"
+        : "=c"(ecx)
+        : "a"(eax)
+        : "%ebx", "%edx");
+    return ((ecx >> 20) & 1) == 1;
 #endif
 }
 

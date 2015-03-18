@@ -6,7 +6,7 @@
  * @license MIT
  */
 var Sse4Crc32 = require("bindings")("sse4_crc32");
-var isHardwareSupported = Sse4Crc32.isHardWareCrcSupported;
+var isHardwareSupported = Sse4Crc32.isHardwareCrcSupported();
 var calculate = isHardwareSupported ? hwCrc32c : swCrc32c;
 
 /**
