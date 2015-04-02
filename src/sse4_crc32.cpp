@@ -10,16 +10,9 @@
  * NOTES:
  * - This code currently works on little-endian hardware only!
  * - Table-based CRC-32C implementation based on code by Mark Adler at http://stackoverflow.com/a/17646775.
- * - CPUID detection based on https://dxr.mozilla.org/mozilla-central/source/media/libsoundtouch/src/cpu_detect_x86.cpp
  *
  * @author Anand Suresh <anandsuresh@gmail.com>
  */
-
-#if defined(__GNUC__) && defined(HAVE_CPUID_H)
-#  include "cpuid.h"
-#elif defined(_M_IX86)
-#  include <intrin.h>
-#endif
 
 #include <stdint.h>
 #include <nan.h>
@@ -57,33 +50,39 @@ static uint32_t crc32cTable[8][256];
 
 
 
+void cpuid(uint32_t op, uint32_t reg[4]) {
+#if defined(__x86_64__)
+    __asm__ volatile(
+        "pushq %%rbx       \n\t"
+        "cpuid             \n\t"
+        "movl  %%ebx, %1   \n\t"
+        "popq  %%rbx       \n\t"
+        : "=a"(reg[0]), "=r"(reg[1]), "=c"(reg[2]), "=d"(reg[3])
+        : "a"(op)
+        : "cc");
+#else
+    __asm__ volatile(
+        "pushl %%ebx       \n\t"
+        "cpuid             \n\t"
+        "movl  %%ebx, %1   \n\t"
+        "popl  %%ebx       \n\t"
+        : "=a"(reg[0]), "=r"(reg[1]), "=c"(reg[2]), "=d"(reg[3])
+        : "a"(op)
+        : "cc");
+#endif
+}
+
+
 /**
  * Returns whether or not Intel's Streaming SIMD Extensions 4.2 is available on the hardware
  *
  * @return true if Intel's Streaming SIMD Extensions 4.2 are present; otherwise false
  */
 bool isSSE42Available() {
-#if !defined(__GNUC__)
-    int reg[4] = {-1};
+    uint32_t reg[4];
 
-    // Check for cpuid support
-    __cpuid(reg,0);
-    if ((unsigned int)reg[0] == 0) return false;
-
-    // Get CPU features
-    __cpuid(reg,1);
-    return ((reg[3] & SSE4_2_FLAG) == SSE4_2_FLAG);
-
-#elif defined(HAVE_CPUID_H)
-    uint32_t eax, ebx, ecx, edx;
-
-    // Get CPU features
-    if (!__get_cpuid (1, &eax, &ebx, &ecx, &edx)) return false;
-
-    return ((edx & SSE4_2_FLAG) == SSE4_2_FLAG);
-#else
-    return false;
-#endif
+    cpuid(1, reg);
+    return ((reg[2] >> 20) & 1) == 1;
 }
 
 

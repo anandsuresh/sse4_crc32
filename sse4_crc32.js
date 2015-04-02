@@ -6,8 +6,8 @@
  * @license MIT
  */
 var Sse4Crc32 = require("bindings")("sse4_crc32");
-var isHardwareSupported = Sse4Crc32.isHardWareCrcSupported;
-var calculate = isHardwareSupported ? hwCrc32c : swCrc32c;
+
+
 
 /**
  * Calculates CRC in software mode
@@ -28,11 +28,10 @@ function swCrc32c(input, initialCrc) {
  * @param {Number} [initialCrc=0] An optional initial CRC
  * @returns {Number}
  */
-var hwCrc32c = isHardwareSupported ? function(input, initialCrc) {
+function hwCrc32c(input, initialCrc) {
     return Sse4Crc32.hwCrc(input, initialCrc || 0);
-} : function() {
-    throw new Error('Hardware CRC-32C not supported!');
 }
+
 
 
 /**
@@ -56,7 +55,7 @@ function Crc32C(input, initialCrc) {
  * @returns {Crc32C}
  */
 Crc32C.prototype.update = function(input) {
-    this.crc32c = calculate(input, this.crc32c);
+    this.crc32c = module.exports.calculate(input, this.crc32c);
     return this;
 };
 
@@ -71,15 +70,16 @@ Crc32C.prototype.crc = function() {
 };
 
 
+
 /**
  * Export the required functions/classes
  * @type {Object}
  */
 module.exports = {
-    isHardwareCrcSupported: isHardwareSupported,
+    isHardwareCrcSupported: Sse4Crc32.isHardwareCrcSupported,
     calculateInSoftware   : swCrc32c,
     calculateOnHardware   : hwCrc32c,
 
     CRC32    : Crc32C,
-    calculate: calculate
+    calculate: Sse4Crc32.isHardwareCrcSupported() ? hwCrc32c : swCrc32c
 };
