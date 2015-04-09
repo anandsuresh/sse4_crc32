@@ -1,39 +1,39 @@
 {
-    "name":            "sse4_crc32",
-    "description":     "Hardware-accelerated CRC32 based on Intel Streaming SIMD Extensions 4.2",
-    "keywords":        [
-        "crc",
-        "crc32",
-        "crc32c",
-        "sse",
-        "sse4",
-        "sse4.2",
-        "error detection"
-    ],
-    "version":         "3.1.0",
-    "author":          "Anand Suresh <anandsuresh@gmail.com> (https://github.com/anandsuresh)",
-    "license":"MIT",
-    "repository":      {
-        "type": "git",
-        "url":  "https://github.com/anandsuresh/sse4_crc32"
-    },
-    "bugs":            {
-        "url": "https://github.com/anandsuresh/sse4_crc32/issues"
-    },
-    "engines":         {
-        "node": ">=0.8.16"
-    },
-    "main":            "./sse4_crc32",
-    "dependencies":    {
-        "node-gyp": "^1.0.2",
-        "bindings": "~1.2.1",
-        "nan":      "^1.7.0"
-    },
-    "devDependencies": {
-        "tap":   ">=0.4.0",
-        "crc32": ">=0.2.1"
-    },
-    "scripts":          {
-        "test": "tap test/*test.js"
-    }
+  "name": "sse4_crc32",
+  "description": "Hardware-accelerated CRC-32C with software fallback",
+  "keywords": [
+    "crc",
+    "crc32",
+    "crc32c",
+    "sse",
+    "sse4",
+    "sse4.2",
+    "error detection"
+  ],
+  "version": "3.1.0",
+  "author": "Anand Suresh <anandsuresh@gmail.com> (https://github.com/anandsuresh)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anandsuresh/sse4_crc32"
+  },
+  "bugs": {
+    "url": "https://github.com/anandsuresh/sse4_crc32/issues"
+  },
+  "engines": {
+    "node": ">=0.8.16"
+  },
+  "main": "./sse4_crc32",
+  "dependencies": {
+    "node-gyp": "^1.0.2",
+    "bindings": "~1.2.1",
+    "nan": "^1.7.0"
+  },
+  "devDependencies": {
+    "tap": ">=0.4.0",
+    "crc32": ">=0.2.1"
+  },
+  "scripts": {
+    "test": "tap test/*test.js"
+  }
 }
