@@ -10,7 +10,7 @@
     "sse4.2",
     "error detection"
   ],
-  "version": "3.1.1",
+  "version": "3.1.2",
   "author": "Anand Suresh <anandsuresh@gmail.com> (https://github.com/anandsuresh)",
   "license": "MIT",
   "repository": {
