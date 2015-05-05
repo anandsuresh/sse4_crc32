@@ -25,11 +25,11 @@
   },
   "main": "./sse4_crc32",
   "dependencies": {
-    "node-gyp": "^1.0.2",
     "bindings": "~1.2.1",
     "nan": "^1.7.0"
   },
   "devDependencies": {
+    "node-gyp": "^1.0.2",
     "mocha": ">=2.1.0",
     "chai": ">=2.0.0",
     "crc32": ">=0.2.1"
