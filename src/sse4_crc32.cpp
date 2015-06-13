@@ -60,6 +60,10 @@ void cpuid(uint32_t op, uint32_t reg[4]) {
         : "=a"(reg[0]), "=r"(reg[1]), "=c"(reg[2]), "=d"(reg[3])
         : "a"(op)
         : "cc");
+#elif defined(_WIN64) || defined(_WIN32)
+	#include <intrin.h>
+
+	__cpuid((int *)reg, 1);
 #else
     __asm__ volatile(
         "pushl %%ebx       \n\t"
