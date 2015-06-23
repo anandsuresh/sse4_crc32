@@ -29,12 +29,14 @@
     "nan": "^1.7.0"
   },
   "devDependencies": {
-    "node-gyp": "^1.0.2",
-    "mocha": ">=2.1.0",
-    "chai": ">=2.0.0",
-    "crc32": ">=0.2.1"
+    "node-gyp": "^2.0.1",
+    "mocha": "^2.1.0",
+    "chai": "^2.0.0",
+    "crc32": "^0.2.1"
   },
   "scripts": {
-    "test": "mocha test/*test.js"
+    "test": "mocha test/*test.js",
+    "debug": "echo \"platform: $(uname -a)\"; echo \"node.js: $(node -v)\"; echo \"npm: $(npm -v)\"; echo \"node-gyp: $(./node_modules/.bin/node-gyp -v)\"; node -e \"console.log('H/w CRC Support: ' + require('./sse4_crc32').isHardwareCrcSupported());\"; node -pe \"require('./sse4_crc32');\"",
+    "hwcrc": "node -e \"console.log('H/w CRC Support: ' + require('./sse4_crc32').isHardwareCrcSupported());\""
   }
 }
