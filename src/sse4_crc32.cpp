@@ -206,8 +206,8 @@ uint32_t hwCrc32c(uint32_t initialCrc, const char *buf, size_t len) {
  * Returns whether or not hardware support is available for CRC calculation
  */
 NAN_METHOD(isHardwareCrcSupported) {
-    Nan::HandleScope scope;
-    info.GetReturnValue().Set(Nan::New<Boolean>(isSSE42Available()));
+    NanScope();
+    NanReturnValue(NanNew<Boolean>(isSSE42Available()));
 }
 
 
@@ -215,44 +215,44 @@ NAN_METHOD(isHardwareCrcSupported) {
  * Calculates CRC-32C for the specified string/buffer using the lookup-table
  */
 NAN_METHOD(swCrc) {
-    Nan::HandleScope scope;
+    NanScope();
     uint32_t initCrc;
     uint32_t crc;
 
     // Ensure an argument is passed
-    if (info.Length() < 1) {
-        info.GetReturnValue().Set(Nan::New<Integer>(0));
-    } else if (info.Length() > 2) {
-        Nan::ThrowTypeError("Invalid number of arguments!");
-        return;
+    if (args.Length() < 1) {
+        NanReturnValue(NanNew<Integer>(0));
+    } else if (args.Length() > 2) {
+        NanThrowTypeError("Invalid number of arguments!");
+        NanReturnUndefined();
     }
 
     // Check for any initial CRC passed to the function
-    if (info.Length() > 1) {
-        if (!(info[1]->IsUint32())) {
-            Nan::ThrowTypeError("Initial CRC-32 is not an integer value as expected!");
-            return;
+    if (args.Length() > 1) {
+        if (!(args[1]->IsUint32())) {
+            NanThrowTypeError("Initial CRC-32 is not an integer value as expected!");
+            NanReturnUndefined();
         }
 
-        initCrc = info[1]->Uint32Value();
+        initCrc = args[1]->Uint32Value();
     } else {
         initCrc = 0;
     }
 
     // Ensure the argument is a buffer or a string
-    if (Buffer::HasInstance(info[0])) {
-        Local<Object> buf = info[0]->ToObject();
+    if (Buffer::HasInstance(args[0])) {
+        Local<Object> buf = args[0]->ToObject();
         crc = swCrc32c(initCrc, (const char *)Buffer::Data(buf), (size_t)Buffer::Length(buf));
-    } else if (info[0]->IsObject()) {
-        Nan::ThrowTypeError("Cannot compute CRC-32 for objects!");
-        return;
+    } else if (args[0]->IsObject()) {
+        NanThrowTypeError("Cannot compute CRC-32 for objects!");
+        NanReturnUndefined();
     } else {
-        Local<String> strInput = info[0]->ToString();
+        Local<String> strInput = args[0]->ToString();
         crc = swCrc32c(initCrc, (const char *)(*String::Utf8Value(strInput)), (size_t)strInput->Utf8Length());
     }
 
     // Calculate the 32-bit CRC
-    info.GetReturnValue().Set(Nan::New<Uint32>(crc));
+    NanReturnValue(NanNew<Uint32>(crc));
 }
 
 
@@ -260,44 +260,44 @@ NAN_METHOD(swCrc) {
  * Calculates CRC-32C for the specified string/buffer using Intel's SSE 4.2 instructions
  */
 NAN_METHOD(hwCrc) {
-    Nan::HandleScope scope;
+    NanScope();
     uint32_t initCrc;
     uint32_t crc;
 
     // Ensure an argument is passed
-    if (info.Length() < 1) {
-        info.GetReturnValue().Set(Nan::New<Integer>(0));
-    } else if (info.Length() > 2) {
-        Nan::ThrowTypeError("Invalid number of arguments!");
-        return;
+    if (args.Length() < 1) {
+        NanReturnValue(NanNew<Integer>(0));
+    } else if (args.Length() > 2) {
+        NanThrowTypeError("Invalid number of arguments!");
+        NanReturnUndefined();
     }
 
     // Check for any initial CRC passed to the function
-    if (info.Length() > 1) {
-        if (!(info[1]->IsUint32())) {
-            Nan::ThrowTypeError("Initial CRC-32C is not an integer value as expected!");
-            return;
+    if (args.Length() > 1) {
+        if (!(args[1]->IsUint32())) {
+            NanThrowTypeError("Initial CRC-32C is not an integer value as expected!");
+            NanReturnUndefined();
         }
 
-        initCrc = info[1]->Uint32Value();
+        initCrc = args[1]->Uint32Value();
     } else {
         initCrc = 0;
     }
 
     // Ensure the argument is a buffer or a string
-    if (node::Buffer::HasInstance(info[0])) {
-        Local<Object> buf = info[0]->ToObject();
+    if (node::Buffer::HasInstance(args[0])) {
+        Local<Object> buf = args[0]->ToObject();
         crc = hwCrc32c(initCrc, (const char *)Buffer::Data(buf), (size_t)Buffer::Length(buf));
-    } else if (info[0]->IsObject()) {
-        Nan::ThrowTypeError("Cannot compute CRC-32C for objects!");
-        return;
+    } else if (args[0]->IsObject()) {
+        NanThrowTypeError("Cannot compute CRC-32C for objects!");
+        NanReturnUndefined();
     } else {
-        Local<String> strInput = info[0]->ToString();
+        Local<String> strInput = args[0]->ToString();
         crc = hwCrc32c(initCrc, (const char *)(*String::Utf8Value(strInput)), (size_t)strInput->Utf8Length());
     }
 
     // Calculate the 32-bit CRC
-    info.GetReturnValue().Set(Nan::New<Uint32>(crc));
+    NanReturnValue(NanNew<Uint32>(crc));
 }
 
 
@@ -308,9 +308,9 @@ NAN_METHOD(hwCrc) {
 void init(Handle<Object> exports) {
     initCrcTable();
 
-    Nan::SetMethod(exports, "isHardwareCrcSupported", isHardwareCrcSupported);
-    Nan::SetMethod(exports, "swCrc", swCrc);
-    Nan::SetMethod(exports, "hwCrc", hwCrc);
+    NODE_SET_METHOD(exports, "isHardwareCrcSupported", isHardwareCrcSupported);
+    NODE_SET_METHOD(exports, "swCrc", swCrc);
+    NODE_SET_METHOD(exports, "hwCrc", hwCrc);
 }
 
 
