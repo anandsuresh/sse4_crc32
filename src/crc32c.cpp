@@ -1,26 +1,24 @@
 /**
- * @file crc32.cpp
- * @brief CRC32 calculator node bindings and fallback implementation
+ * @file crc32c.cpp
+ * @brief Node.js bindings for CRC-32C calculation using hardware-acceleration, when available.
  *
- * The code below provides the bindings for the node-addon allowing
- * for interfacing of C/C++ code with JavaScript.
- * It chooses between two versions of the CRC-32C calculator:
- * - The hardware-accelerated version that uses Intel's SSE 4.2 instructions,
- *   implemented in the file sse4_crc32.cpp
- * - A table-lookup based CRC calculated implemented in software
- *   for non-Nehalam-based architectures
+ * The code below provides the bindings for the node-addon allowing for interfacing of C/C++ code with
+ * JavaScript. It chooses between two versions of the CRC-32C calculator:
+ * - The hardware-accelerated version that uses Intel's SSE 4.2 instructions, implemented in crc32c_sse42.cpp
+ * - A table-lookup based CRC calculated implemented in software for non-Nehalam-based architectures
  *
  * NOTES:
  * - This code currently works on little-endian hardware only!
- * - Table-based CRC-32C implementation based on code by Mark Adler
- *   at http://stackoverflow.com/a/17646775.
+ * - Table-based CRC-32C implementation based on code by Mark Adler at http://stackoverflow.com/a/17646775.
  *
  * @author Anand Suresh <anandsuresh@gmail.com>
  */
 
 #include <stdint.h>
 #include <nan.h>
-#include "crc32.h"
+
+#include "crc32c.h"
+
 
 
 using namespace v8;
@@ -31,6 +29,9 @@ using namespace node;
 // Bit-mask for the SSE 4.2 flag in the CPU ID
 #define SSE4_2_FLAG         0x100000
 
+// The CRC-32C polynomial in reversed bit order
+#define CRC32C_POLYNOMIAL   0x82f63b78
+
 
 
 // Stores the CRC-32 lookup table for the software-fallback implementation
@@ -38,6 +39,9 @@ static uint32_t crc32cTable[8][256];
 
 
 
+/**
+ * Cross-platform CPU feature set detection to check for availability of hardware-based CRC-32C
+ */
 void cpuid(uint32_t op, uint32_t reg[4]) {
 #if defined(__x86_64__)
     __asm__ volatile(
@@ -49,9 +53,8 @@ void cpuid(uint32_t op, uint32_t reg[4]) {
         : "a"(op)
         : "cc");
 #elif defined(_WIN64) || defined(_WIN32)
-	#include <intrin.h>
-
-	__cpuid((int *)reg, 1);
+    #include <intrin.h>
+    __cpuid((int *)reg, 1);
 #else
     __asm__ volatile(
         "pushl %%ebx       \n\t"

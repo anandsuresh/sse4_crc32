@@ -2,10 +2,10 @@
     "includes": [ "common.gypi" ],
     "targets":  [
         {
-            "target_name":    "sse4_crc32_hw",
+            "target_name":    "crc32c_sse42",
             "type":           "static_library",
             "sources":        [
-                "src/sse4_crc32.cpp"
+                "src/crc32c_sse42.cpp"
             ],
             "xcode_settings": {
                 "GCC_ENABLE_SSE42_EXTENSIONS": "YES"
@@ -15,13 +15,13 @@
         {
             "target_name":    "sse4_crc32",
             "sources":        [
-                "src/crc32.cpp"
+                "src/crc32c.cpp"
             ],
             "include_dirs":   [
                 "<!(node -e \"require('nan')\")"
             ],
             "dependencies":   [
-                "sse4_crc32_hw"
+                "crc32c_sse42"
             ]
         }
     ]

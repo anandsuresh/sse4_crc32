@@ -1,16 +1,19 @@
 /**
- * @file sse4_crc32.cpp
+ * @file crc32c_sse42.cpp
  * @brief CRC32 calculator based on Intel's Streaming SIMD Extensions 4.2
  *
- * The code below provides the SSE4-enabled version of the CRC32 computation.
- * Since it has to be compiled for a more specific target architecture,
- * it has to be in a file distinct from the main interface code.
+ * The code below uses Intel's Streaming SIMD Extensions 4.2 (available from the Nehalam series) to perform
+ * high-speed CRC-32C calculation on hardware. This code is compiled with the -msse4.2 flag as a static
+ * library, and then declared as a dependency for the node-addon module, allowing for compilation on
+ * non-Nehalam processors.
  *
  * @author Anand Suresh <anandsuresh@gmail.com>
  */
 
 #include <smmintrin.h>
-#include "crc32.h"
+
+#include "crc32c.h"
+
 
 
 // Byte-boundary alignment issues
@@ -24,6 +27,8 @@
             (crc) = op((crc), *(type *) (buf));                                                              \
         }                                                                                                    \
     } while(0)
+
+
 
 /**
  * Calculates CRC-32C using hardware support
