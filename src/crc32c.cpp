@@ -1,10 +1,10 @@
 /**
- * @file crc32.c
- * @brief CRC32 calculator based on Intel's Streaming SIMD Extensions 4.2
+ * @file crc32c.cpp
+ * @brief Node.js bindings for CRC-32C calculation using hardware-acceleration, when available.
  *
  * The code below provides the bindings for the node-addon allowing for interfacing of C/C++ code with
- * JavaScript. It implemements 2 versions of the CRC-32C calculator:
- * - The hardware-accelerated version that uses Intel's SSE 4.2 instructions
+ * JavaScript. It chooses between two versions of the CRC-32C calculator:
+ * - The hardware-accelerated version that uses Intel's SSE 4.2 instructions, implemented in crc32c_sse42.cpp
  * - A table-lookup based CRC calculated implemented in software for non-Nehalam-based architectures
  *
  * NOTES:
@@ -16,7 +16,8 @@
 
 #include <stdint.h>
 #include <nan.h>
-#include <smmintrin.h>
+
+#include "crc32c.h"
 
 
 
@@ -31,18 +32,6 @@ using namespace node;
 // The CRC-32C polynomial in reversed bit order
 #define CRC32C_POLYNOMIAL   0x82f63b78
 
-// Byte-boundary alignment issues
-#define ALIGN_SIZE          0x08UL              // Align at an 8-byte boundary
-#define ALIGN_MASK          (ALIGN_SIZE - 1)    // Bitmask for 8-byte bound addresses
-
-// Performs H/W CRC operations
-#define CALC_CRC(op, crc, type, buf, len)                                                                    \
-    do {                                                                                                     \
-        for (; (len) >= sizeof(type); (len) -= sizeof(type), buf += sizeof(type)) {                          \
-            (crc) = op((crc), *(type *) (buf));                                                              \
-        }                                                                                                    \
-    } while(0)
-
 
 
 // Stores the CRC-32 lookup table for the software-fallback implementation
@@ -50,6 +39,9 @@ static uint32_t crc32cTable[8][256];
 
 
 
+/**
+ * Cross-platform CPU feature set detection to check for availability of hardware-based CRC-32C
+ */
 void cpuid(uint32_t op, uint32_t reg[4]) {
 #if defined(__x86_64__)
     __asm__ volatile(
@@ -61,9 +53,8 @@ void cpuid(uint32_t op, uint32_t reg[4]) {
         : "a"(op)
         : "cc");
 #elif defined(_WIN64) || defined(_WIN32)
-	#include <intrin.h>
-
-	__cpuid((int *)reg, 1);
+    #include <intrin.h>
+    __cpuid((int *)reg, 1);
 #else
     __asm__ volatile(
         "pushl %%ebx       \n\t"
@@ -164,42 +155,6 @@ uint32_t swCrc32c(uint32_t initialCrc, const char *buf, size_t len) {
     // XOR again with INT_MAX
     return (uint32_t)(crc ^= 0xFFFFFFFF);
 }
-
-
-/**
- * Calculates CRC-32C using hardware support
- *
- * @param initialCrc The initial CRC to use for the operation
- * @param buf The buffer that stores the data whose CRC is to be calculated
- * @param len The size of the buffer
- * @return The CRC-32C of the data in the buffer
- */
-uint32_t hwCrc32c(uint32_t initialCrc, const char *buf, size_t len) {
-    uint32_t crc = initialCrc;
-
-    // If the string is empty, return the initial crc
-    if (len == 0) return crc;
-
-    // XOR the initial CRC with INT_MAX
-    crc ^= 0xFFFFFFFF;
-
-    // Align the input to the word boundary
-    for (; (len > 0) && ((size_t)buf & ALIGN_MASK); len--, buf++) {
-        crc = _mm_crc32_u8(crc, *buf);
-    }
-
-    // Blast off the CRC32 calculation on hardware
-#if defined(__x86_64__) || defined(_M_X64)
-    CALC_CRC(_mm_crc32_u64, crc, uint64_t, buf, len);
-#endif
-    CALC_CRC(_mm_crc32_u32, crc, uint32_t, buf, len);
-    CALC_CRC(_mm_crc32_u16, crc, uint16_t, buf, len);
-    CALC_CRC(_mm_crc32_u8, crc, uint8_t, buf, len);
-
-    // XOR again with INT_MAX
-    return (crc ^= 0xFFFFFFFF);
-}
-
 
 
 /**
