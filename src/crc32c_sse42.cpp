@@ -10,7 +10,7 @@
  * @author Anand Suresh <anandsuresh@gmail.com>
  */
 
-#include <smmintrin.h>
+#include <nmmintrin.h>
 
 #include "crc32c.h"
 
