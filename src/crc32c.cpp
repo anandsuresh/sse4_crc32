@@ -8,7 +8,7 @@
  * - A table-lookup based CRC calculated implemented in software for non-Nehalam-based architectures
  *
  * NOTES:
- * - This code currently works on little-endian hardware only!
+ * - This code, though originally designed for little-endian hardware, should work for all platforms.
  * - Table-based CRC-32C implementation based on code by Mark Adler at http://stackoverflow.com/a/17646775.
  *
  * @author Anand Suresh <anandsuresh@gmail.com>
@@ -43,7 +43,10 @@ static uint32_t crc32cTable[8][256];
  * Cross-platform CPU feature set detection to check for availability of hardware-based CRC-32C
  */
 void cpuid(uint32_t op, uint32_t reg[4]) {
-#if defined(__x86_64__)
+#if defined(_WIN64) || defined(_WIN32)
+    #include <intrin.h>
+    __cpuid((int *)reg, 1);
+#elif defined(__x86_64__)
     __asm__ volatile(
         "pushq %%rbx       \n\t"
         "cpuid             \n\t"
@@ -52,10 +55,7 @@ void cpuid(uint32_t op, uint32_t reg[4]) {
         : "=a"(reg[0]), "=r"(reg[1]), "=c"(reg[2]), "=d"(reg[3])
         : "a"(op)
         : "cc");
-#elif defined(_WIN64) || defined(_WIN32)
-    #include <intrin.h>
-    __cpuid((int *)reg, 1);
-#else
+#elif defined(__i386__)
     __asm__ volatile(
         "pushl %%ebx       \n\t"
         "cpuid             \n\t"
@@ -64,6 +64,8 @@ void cpuid(uint32_t op, uint32_t reg[4]) {
         : "=a"(reg[0]), "=r"(reg[1]), "=c"(reg[2]), "=d"(reg[3])
         : "a"(op)
         : "cc");
+#else
+    reg[0] = reg[1] = reg[2] = reg[3] = 0;
 #endif
 }
 
@@ -167,88 +169,60 @@ NAN_METHOD(isHardwareCrcSupported) {
 
 
 /**
- * Calculates CRC-32C for the specified string/buffer using the lookup-table
+ * Calculates CRC-32C for the specified string/buffer
  */
-NAN_METHOD(swCrc) {
+NAN_METHOD(calculateCrc) {
     Nan::HandleScope scope;
     uint32_t initCrc;
     uint32_t crc;
+    bool useTableLookup;
 
     // Ensure an argument is passed
     if (info.Length() < 1) {
         info.GetReturnValue().Set(Nan::New<Integer>(0));
-    } else if (info.Length() > 2) {
+    } else if (info.Length() > 3) {
         Nan::ThrowTypeError("Invalid number of arguments!");
         return;
     }
 
-    // Check for any initial CRC passed to the function
-    if (info.Length() > 1) {
-        if (!(info[1]->IsUint32())) {
-            Nan::ThrowTypeError("Initial CRC-32 is not an integer value as expected!");
-            return;
-        }
-
-        initCrc = info[1]->Uint32Value();
-    } else {
-        initCrc = 0;
-    }
-
-    // Ensure the argument is a buffer or a string
-    if (Buffer::HasInstance(info[0])) {
-        Local<Object> buf = info[0]->ToObject();
-        crc = swCrc32c(initCrc, (const char *)Buffer::Data(buf), (size_t)Buffer::Length(buf));
-    } else if (info[0]->IsObject()) {
-        Nan::ThrowTypeError("Cannot compute CRC-32 for objects!");
-        return;
-    } else {
-        Local<String> strInput = info[0]->ToString();
-        crc = swCrc32c(initCrc, (const char *)(*String::Utf8Value(strInput)), (size_t)strInput->Utf8Length());
-    }
-
-    // Calculate the 32-bit CRC
-    info.GetReturnValue().Set(Nan::New<Uint32>(crc));
-}
-
-
-/**
- * Calculates CRC-32C for the specified string/buffer using Intel's SSE 4.2 instructions
- */
-NAN_METHOD(hwCrc) {
-    Nan::HandleScope scope;
-    uint32_t initCrc;
-    uint32_t crc;
-
-    // Ensure an argument is passed
-    if (info.Length() < 1) {
-        info.GetReturnValue().Set(Nan::New<Integer>(0));
-    } else if (info.Length() > 2) {
-        Nan::ThrowTypeError("Invalid number of arguments!");
+    // Check if the table-lookup is required
+    if (!info[0]->IsBoolean()) {
+        Nan::ThrowTypeError("useTableLookup isn't a boolean value as expected!");
         return;
     }
+    useTableLookup = info[0]->BooleanValue();
 
     // Check for any initial CRC passed to the function
-    if (info.Length() > 1) {
-        if (!(info[1]->IsUint32())) {
+    if (info.Length() > 2) {
+        if (!(info[2]->IsUint32())) {
             Nan::ThrowTypeError("Initial CRC-32C is not an integer value as expected!");
             return;
         }
-
-        initCrc = info[1]->Uint32Value();
+        initCrc = info[2]->Uint32Value();
     } else {
         initCrc = 0;
     }
 
     // Ensure the argument is a buffer or a string
-    if (node::Buffer::HasInstance(info[0])) {
-        Local<Object> buf = info[0]->ToObject();
-        crc = hwCrc32c(initCrc, (const char *)Buffer::Data(buf), (size_t)Buffer::Length(buf));
-    } else if (info[0]->IsObject()) {
+    if (node::Buffer::HasInstance(info[1])) {
+        Local<Object> buf = info[1]->ToObject();
+
+        if (useTableLookup) {
+            crc = swCrc32c(initCrc, (const char *)Buffer::Data(buf), (size_t)Buffer::Length(buf));
+        } else {
+            crc = hwCrc32c(initCrc, (const char *)Buffer::Data(buf), (size_t)Buffer::Length(buf));
+        }
+    } else if (info[1]->IsObject()) {
         Nan::ThrowTypeError("Cannot compute CRC-32C for objects!");
         return;
     } else {
-        Local<String> strInput = info[0]->ToString();
-        crc = hwCrc32c(initCrc, (const char *)(*String::Utf8Value(strInput)), (size_t)strInput->Utf8Length());
+        Local<String> strInput = info[1]->ToString();
+
+        if (useTableLookup) {
+            crc = swCrc32c(initCrc, (const char *)(*String::Utf8Value(strInput)), (size_t)strInput->Utf8Length());
+        } else {
+            crc = hwCrc32c(initCrc, (const char *)(*String::Utf8Value(strInput)), (size_t)strInput->Utf8Length());
+        }
     }
 
     // Calculate the 32-bit CRC
@@ -264,8 +238,7 @@ void init(Handle<Object> exports) {
     initCrcTable();
 
     Nan::SetMethod(exports, "isHardwareCrcSupported", isHardwareCrcSupported);
-    Nan::SetMethod(exports, "swCrc", swCrc);
-    Nan::SetMethod(exports, "hwCrc", hwCrc);
+    Nan::SetMethod(exports, "calculateCrc", calculateCrc);
 }
 
 

@@ -17,7 +17,7 @@ var Sse4Crc32 = require("bindings")("sse4_crc32");
  * @returns {Number}
  */
 function swCrc32c(input, initialCrc) {
-    return Sse4Crc32.swCrc(input, initialCrc || 0);
+    return Sse4Crc32.calculateCrc(true, input, initialCrc || 0);
 }
 
 
@@ -29,7 +29,7 @@ function swCrc32c(input, initialCrc) {
  * @returns {Number}
  */
 function hwCrc32c(input, initialCrc) {
-    return Sse4Crc32.hwCrc(input, initialCrc || 0);
+    return Sse4Crc32.calculateCrc(false, input, initialCrc || 0);
 }
 
 
@@ -43,7 +43,6 @@ function hwCrc32c(input, initialCrc) {
  */
 function Crc32C(input, initialCrc) {
     this.crc32c = initialCrc || 0;
-
     if (input) this.update(input);
 }
 
@@ -77,9 +76,9 @@ Crc32C.prototype.crc = function() {
  */
 module.exports = {
     isHardwareCrcSupported: Sse4Crc32.isHardwareCrcSupported,
-    calculateInSoftware   : swCrc32c,
-    calculateOnHardware   : hwCrc32c,
+    calculateInSoftware: swCrc32c,
+    calculateOnHardware: hwCrc32c,
 
-    CRC32    : Crc32C,
-    calculate: Sse4Crc32.isHardwareCrcSupported() ? hwCrc32c : swCrc32c
+    CRC32: Crc32C,
+    calculate: Sse4Crc32.calculateCrc.bind(null, Sse4Crc32.isHardwareCrcSupported())
 };
