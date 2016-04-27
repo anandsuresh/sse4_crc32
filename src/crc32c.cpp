@@ -234,7 +234,7 @@ NAN_METHOD(calculateCrc) {
 /**
  * Initialize the module
  */
-void init(Handle<Object> exports) {
+void init(Local<Object> exports) {
     initCrcTable();
 
     Nan::SetMethod(exports, "isHardwareCrcSupported", isHardwareCrcSupported);
