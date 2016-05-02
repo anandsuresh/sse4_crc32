@@ -175,7 +175,7 @@ NAN_METHOD(calculateCrc) {
     Nan::HandleScope scope;
     uint32_t initCrc;
     uint32_t crc;
-    bool useTableLookup;
+    bool useHardwareCrc;
 
     // Ensure an argument is passed
     if (info.Length() < 1) {
@@ -187,10 +187,10 @@ NAN_METHOD(calculateCrc) {
 
     // Check if the table-lookup is required
     if (!info[0]->IsBoolean()) {
-        Nan::ThrowTypeError("useTableLookup isn't a boolean value as expected!");
+        Nan::ThrowTypeError("useHardwareCrc isn't a boolean value as expected!");
         return;
     }
-    useTableLookup = info[0]->BooleanValue();
+    useHardwareCrc = info[0]->BooleanValue();
 
     // Check for any initial CRC passed to the function
     if (info.Length() > 2) {
@@ -207,10 +207,10 @@ NAN_METHOD(calculateCrc) {
     if (node::Buffer::HasInstance(info[1])) {
         Local<Object> buf = info[1]->ToObject();
 
-        if (useTableLookup) {
-            crc = swCrc32c(initCrc, (const char *)Buffer::Data(buf), (size_t)Buffer::Length(buf));
-        } else {
+        if (useHardwareCrc) {
             crc = hwCrc32c(initCrc, (const char *)Buffer::Data(buf), (size_t)Buffer::Length(buf));
+        } else {
+            crc = swCrc32c(initCrc, (const char *)Buffer::Data(buf), (size_t)Buffer::Length(buf));
         }
     } else if (info[1]->IsObject()) {
         Nan::ThrowTypeError("Cannot compute CRC-32C for objects!");
@@ -218,10 +218,10 @@ NAN_METHOD(calculateCrc) {
     } else {
         Local<String> strInput = info[1]->ToString();
 
-        if (useTableLookup) {
-            crc = swCrc32c(initCrc, (const char *)(*String::Utf8Value(strInput)), (size_t)strInput->Utf8Length());
-        } else {
+        if (useHardwareCrc) {
             crc = hwCrc32c(initCrc, (const char *)(*String::Utf8Value(strInput)), (size_t)strInput->Utf8Length());
+        } else {
+            crc = swCrc32c(initCrc, (const char *)(*String::Utf8Value(strInput)), (size_t)strInput->Utf8Length());
         }
     }
 
