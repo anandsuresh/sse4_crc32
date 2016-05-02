@@ -17,7 +17,7 @@ var Sse4Crc32 = require("bindings")("sse4_crc32");
  * @returns {Number}
  */
 function swCrc32c(input, initialCrc) {
-    return Sse4Crc32.calculateCrc(true, input, initialCrc || 0);
+    return Sse4Crc32.calculateCrc(false, input, initialCrc || 0);
 }
 
 
@@ -29,7 +29,7 @@ function swCrc32c(input, initialCrc) {
  * @returns {Number}
  */
 function hwCrc32c(input, initialCrc) {
-    return Sse4Crc32.calculateCrc(false, input, initialCrc || 0);
+    return Sse4Crc32.calculateCrc(true, input, initialCrc || 0);
 }
 
 
