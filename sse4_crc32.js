@@ -80,5 +80,5 @@ module.exports = {
     calculateOnHardware: hwCrc32c,
 
     CRC32: Crc32C,
-    calculate: Sse4Crc32.calculateCrc.bind(null, Sse4Crc32.isHardwareCrcSupported())
+    calculate: Sse4Crc32.calculateCrc.bind(null, !Sse4Crc32.isHardwareCrcSupported())
 };
