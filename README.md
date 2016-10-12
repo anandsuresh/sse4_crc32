@@ -1,4 +1,4 @@
-# SSE4-CRC32 [![Build Status](https://travis-ci.org/Voxer/sse4_crc32.svg?branch=master)](https://travis-ci.org/Voxer/sse4_crc32) [![npm version](https://badge.fury.io/js/sse4_crc32.svg)](http://badge.fury.io/js/sse4_crc32)
+# SSE4-CRC32 [![Build Status](https://travis-ci.org/anandsuresh/sse4_crc32.svg?branch=master)](https://travis-ci.org/anandsuresh/sse4_crc32) [![npm version](https://badge.fury.io/js/sse4_crc32.svg)](http://badge.fury.io/js/sse4_crc32)
 
 Starting with the Nehalam series, Intel processors feature the Streaming SIMD Extensions instruction set which
 provide a hardware-accelerated version of the CRC32 algorithm (Castagnoli variant). This library uses the
