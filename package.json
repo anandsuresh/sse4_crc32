@@ -26,13 +26,13 @@
   "main": "./sse4_crc32",
   "dependencies": {
     "bindings": "~1.2.1",
-    "nan": "^2.3.5"
+    "nan": "2.8.0"
   },
   "devDependencies": {
-    "node-gyp": "^3.3.1",
-    "mocha": "^2.1.0",
     "chai": "^2.0.0",
-    "crc32": "^0.2.1"
+    "crc32": "^0.2.1",
+    "mocha": "^2.1.0",
+    "node-gyp": "^3.3.1"
   },
   "scripts": {
     "test": "mocha test/*test.js",
