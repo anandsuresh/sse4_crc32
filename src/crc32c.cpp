@@ -15,15 +15,9 @@
  */
 
 #include <stdint.h>
-#include <nan.h>
+#include <napi.h>
 
 #include "crc32c.h"
-
-
-
-using namespace v8;
-using namespace node;
-
 
 
 // Bit-mask for the SSE 4.2 flag in the CPU ID
@@ -164,84 +158,76 @@ uint32_t swCrc32c(uint32_t initialCrc, const char *buf, size_t len) {
 /**
  * Returns whether or not hardware support is available for CRC calculation
  */
-NAN_METHOD(isHardwareCrcSupported) {
-    Nan::HandleScope scope;
-    info.GetReturnValue().Set(Nan::New<Boolean>(isSSE42Available()));
+Napi::Value isHardwareCrcSupported(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    return Napi::Boolean::New(env,isSSE42Available());
 }
 
 
 /**
  * Calculates CRC-32C for the specified string/buffer
  */
-NAN_METHOD(calculateCrc) {
-    Nan::HandleScope scope;
+Napi::Value calculateCrc(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
     uint32_t initCrc;
     uint32_t crc;
     bool useHardwareCrc;
 
     // Ensure an argument is passed
     if (info.Length() < 1) {
-        info.GetReturnValue().Set(Nan::New<Integer>(0));
+        return Napi::Number::New(env, 0);
     } else if (info.Length() > 3) {
-        Nan::ThrowTypeError("Invalid number of arguments!");
-        return;
+        throw Napi::TypeError::New(env, "Invalid number of arguments!");
     }
 
     // Check if the table-lookup is required
-    if (!info[0]->IsBoolean()) {
-        Nan::ThrowTypeError("useHardwareCrc isn't a boolean value as expected!");
-        return;
+    if (!info[0].IsBoolean()) {
+        throw Napi::TypeError::New(env, "useHardwareCrc isn't a boolean value as expected!");
     }
-    useHardwareCrc = info[0]->BooleanValue();
+    useHardwareCrc = info[0].As<Napi::Boolean>();
 
     // Check for any initial CRC passed to the function
     if (info.Length() > 2) {
-        if (!(info[2]->IsUint32())) {
-            Nan::ThrowTypeError("Initial CRC-32C is not an integer value as expected!");
-            return;
+        if (!(info[2].IsNumber())) {
+            throw Napi::TypeError::New(env, "Initial CRC-32C is not an integer value as expected!");
         }
-        initCrc = info[2]->Uint32Value();
+        initCrc = info[2].As<Napi::Number>().Uint32Value();
     } else {
         initCrc = 0;
     }
 
     // Ensure the argument is a buffer or a string
-    if (node::Buffer::HasInstance(info[1])) {
-        Local<Object> buf = info[1]->ToObject();
-
+    if (info[1].IsBuffer()) {
+        Napi::Buffer<char> buf = info[1].As<Napi::Buffer<char>>();
         if (useHardwareCrc) {
-            crc = hwCrc32c(initCrc, (const char *)Buffer::Data(buf), (size_t)Buffer::Length(buf));
+            crc = hwCrc32c(initCrc, (const char *)buf.Data(), (size_t)buf.Length());
         } else {
-            crc = swCrc32c(initCrc, (const char *)Buffer::Data(buf), (size_t)Buffer::Length(buf));
+            crc = swCrc32c(initCrc, (const char *)buf.Data(), (size_t)buf.Length());
         }
-    } else if (info[1]->IsObject()) {
-        Nan::ThrowTypeError("Cannot compute CRC-32C for objects!");
-        return;
+    } else if (info[1].IsObject()) {
+        throw Napi::TypeError::New(env, "Cannot compute CRC-32C for objects!");
     } else {
-        Local<String> strInput = info[1]->ToString();
+        std::string strInput = info[1].As<Napi::String>().Utf8Value();
 
-        if (useHardwareCrc) {
-            crc = hwCrc32c(initCrc, (const char *)(*String::Utf8Value(strInput)), (size_t)strInput->Utf8Length());
+        /*if (useHardwareCrc) {
+            crc = hwCrc32c(initCrc, (const char *)(*strInput.Utf8Value()), (size_t)strInput.Utf8Length());
         } else {
-            crc = swCrc32c(initCrc, (const char *)(*String::Utf8Value(strInput)), (size_t)strInput->Utf8Length());
-        }
+            crc = swCrc32c(initCrc, (const char *)(*strInput.Utf8Value()), (size_t)strInput.Utf8Length());
+        }*/
     }
 
     // Calculate the 32-bit CRC
-    info.GetReturnValue().Set(Nan::New<Uint32>(crc));
+    return Napi::Number::New(env, crc);
 }
-
-
 
 /**
  * Initialize the module
  */
-void init(Local<Object> exports) {
+Napi::Object init(Napi::Env env, Napi::Object exports) {
     initCrcTable();
+    exports["isHardwareCrcSupported"] = Napi::Function::New(env, isHardwareCrcSupported);
+    exports["calculateCrc"] = Napi::Function::New(env, calculateCrc);
+    return exports;
+};
 
-    Nan::SetMethod(exports, "isHardwareCrcSupported", isHardwareCrcSupported);
-    Nan::SetMethod(exports, "calculateCrc", calculateCrc);
-}
-
-
-NODE_MODULE(sse4_crc32, init)
+NODE_API_MODULE(sse4_crc32, init);
