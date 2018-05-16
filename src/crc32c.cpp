@@ -209,11 +209,11 @@ Napi::Value calculateCrc(const Napi::CallbackInfo& info) {
     } else {
         std::string strInput = info[1].As<Napi::String>().Utf8Value();
 
-        /*if (useHardwareCrc) {
-            crc = hwCrc32c(initCrc, (const char *)(*strInput.Utf8Value()), (size_t)strInput.Utf8Length());
+        if (useHardwareCrc) {
+            crc = hwCrc32c(initCrc, (const char *)strInput.c_str(), (size_t)strInput.length());
         } else {
-            crc = swCrc32c(initCrc, (const char *)(*strInput.Utf8Value()), (size_t)strInput.Utf8Length());
-        }*/
+            crc = swCrc32c(initCrc, (const char *)strInput.c_str(), (size_t)strInput.length());
+        }
     }
 
     // Calculate the 32-bit CRC
