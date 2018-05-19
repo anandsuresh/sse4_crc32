@@ -21,7 +21,7 @@
     "url": "https://github.com/anandsuresh/sse4_crc32/issues"
   },
   "engines": {
-    "node": ">=0.8"
+    "node": ">=4"
   },
   "main": "./sse4_crc32",
   "dependencies": {
