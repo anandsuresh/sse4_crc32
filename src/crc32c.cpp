@@ -221,9 +221,9 @@ NAN_METHOD(calculateCrc) {
         Local<String> strInput = info[1]->ToString();
 
         if (useHardwareCrc) {
-            crc = hwCrc32c(initCrc, (const char *)(*String::Utf8Value(strInput)), (size_t)strInput->Utf8Length());
+            crc = hwCrc32c(initCrc, (const char *)(*Nan::Utf8String(strInput)), (size_t)strInput->Utf8Length());
         } else {
-            crc = swCrc32c(initCrc, (const char *)(*String::Utf8Value(strInput)), (size_t)strInput->Utf8Length());
+            crc = swCrc32c(initCrc, (const char *)(*Nan::Utf8String(strInput)), (size_t)strInput->Utf8Length());
         }
     }
 
