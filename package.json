@@ -31,7 +31,7 @@
     "chai": "^4.1.2",
     "crc32": "^0.2.2",
     "mocha": "^5.2.0",
-    "node-gyp": "^3.6.2"
+    "node-gyp": "^5.0.0"
   },
   "scripts": {
     "benchmark": "node benchmark",
