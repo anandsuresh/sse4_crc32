@@ -19,7 +19,7 @@ describe('Sse4Crc32', function() {
                 output: 3039989317
             },
             'buffer': {
-                input : new Buffer('SSE4-CRC32: A hardware accelerated CRC32 implementation for node.js'),
+                input : Buffer.from('SSE4-CRC32: A hardware accelerated CRC32 implementation for node.js'),
                 output: 3039989317
             }
         };

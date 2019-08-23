@@ -192,7 +192,7 @@ NAN_METHOD(calculateCrc) {
         Nan::ThrowTypeError("useHardwareCrc isn't a boolean value as expected!");
         return;
     }
-    useHardwareCrc = info[0]->BooleanValue();
+    useHardwareCrc = Nan::To<bool>(info[0]).FromMaybe(false);
 
     // Check for any initial CRC passed to the function
     if (info.Length() > 2) {
@@ -200,14 +200,14 @@ NAN_METHOD(calculateCrc) {
             Nan::ThrowTypeError("Initial CRC-32C is not an integer value as expected!");
             return;
         }
-        initCrc = info[2]->Uint32Value();
+        initCrc = Nan::To<uint32_t>(info[2]).FromMaybe(0);
     } else {
         initCrc = 0;
     }
 
     // Ensure the argument is a buffer or a string
     if (node::Buffer::HasInstance(info[1])) {
-        Local<Object> buf = info[1]->ToObject();
+        Local<Object> buf = Nan::To<v8::Object>(info[1]).ToLocalChecked();
 
         if (useHardwareCrc) {
             crc = hwCrc32c(initCrc, (const char *)Buffer::Data(buf), (size_t)Buffer::Length(buf));
@@ -218,12 +218,12 @@ NAN_METHOD(calculateCrc) {
         Nan::ThrowTypeError("Cannot compute CRC-32C for objects!");
         return;
     } else {
-        Local<String> strInput = info[1]->ToString();
+        Local<String> strInput = Nan::To<String>(info[1]).ToLocalChecked();
 
         if (useHardwareCrc) {
-            crc = hwCrc32c(initCrc, (const char *)(*Nan::Utf8String(strInput)), (size_t)strInput->Utf8Length());
+            crc = hwCrc32c(initCrc, (const char *)(*Nan::Utf8String(strInput)), (size_t)Nan::Utf8String(strInput).length());
         } else {
-            crc = swCrc32c(initCrc, (const char *)(*Nan::Utf8String(strInput)), (size_t)strInput->Utf8Length());
+            crc = swCrc32c(initCrc, (const char *)(*Nan::Utf8String(strInput)), (size_t)Nan::Utf8String(strInput).length());
         }
     }
 
