@@ -54,15 +54,15 @@ Napi::Value sse42_crc(const Napi::CallbackInfo &info) {
     Napi::Buffer<char> data = info[0].As<Napi::Buffer<char>>();
     buf = (const char *)data.Data();
     len = (size_t)data.Length();
+    return Napi::Number::New(env, sse42_calculate(crc, buf, len));
   } else if (info[0].IsString()) {
     std::string strInput = info[0].As<Napi::String>().Utf8Value();
     buf = (const char *)strInput.c_str();
     len = (size_t)strInput.length();
+    return Napi::Number::New(env, sse42_calculate(crc, buf, len));
   } else {
     throw Napi::TypeError::New(env, "input is not a string/buffer!");
   }
-
-  return Napi::Number::New(env, sse42_calculate(crc, buf, len));
 }
 
 /**
@@ -94,15 +94,15 @@ Napi::Value table_crc(const Napi::CallbackInfo &info) {
     Napi::Buffer<char> data = info[0].As<Napi::Buffer<char>>();
     buf = (const char *)data.Data();
     len = (size_t)data.Length();
+    return Napi::Number::New(env, table_calculate(crc, buf, len));
   } else if (info[0].IsString()) {
     std::string strInput = info[0].As<Napi::String>().Utf8Value();
     buf = (const char *)strInput.c_str();
     len = (size_t)strInput.length();
+    return Napi::Number::New(env, table_calculate(crc, buf, len));
   } else {
     throw Napi::TypeError::New(env, "input is not a string/buffer!");
   }
-
-  return Napi::Number::New(env, table_calculate(crc, buf, len));
 }
 
 /**
