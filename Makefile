@@ -24,7 +24,7 @@ benchmark: build
 		for f in $(BENCHMARK_FILES); do node $$f; done;
 
 clean:
-		-$(NODE_GYP) clean
+		$(NODE_GYP) clean
 
 
 .PHONY: clean build test
