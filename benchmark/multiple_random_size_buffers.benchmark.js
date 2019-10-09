@@ -25,7 +25,7 @@ const BUFFERS = []
  */
 function initBuffers (benchmark) {
   for (i = 0; i < benchmark.iterations; i++) {
-    const len = Math.random() * 65536
+    const len = Math.floor(Math.random() * 65536)
     const buf = Buffer.alloc(len)
 
     let j = 0
