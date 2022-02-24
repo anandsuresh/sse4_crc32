@@ -15,10 +15,18 @@
  */
 function run (fn, count) {
   const startTime = process.hrtime()
-  for (let i = 0; i < count; i++) fn(i)
+
+  try {
+    for (let i = 0; i < count; i++) {
+      fn(i)
+    }
+  } catch (err) {
+    return err.message
+  }
+
   const endTime = process.hrtime(startTime)
 
-  return (endTime[0] * 1e9 + endTime[1]) / 1000000
+  return ((endTime[0] * 1e9 + endTime[1]) / 1000000).toString() + ' ms'
 }
 
 /**
@@ -37,6 +45,6 @@ function run (fn, count) {
   console.log(`${benchmark.title}, ${benchmark.iterations} iterations:`)
   benchmark.tests
     .map(test => Object.assign(test, {time: run(test.fn, benchmark.iterations)}))
-    .forEach(test => console.log(`- ${test.title}: %d ms`, test.time))
+    .forEach(test => console.log(`- ${test.title}: %s`, test.time))
   console.log('\n')
 })
