@@ -25,6 +25,8 @@
 #include <napi.h>
 #include <stdio.h>
 
+#if defined(_MSC_VER) || defined(__x86_64__) || defined(__i386__)
+// Skip as sse42.c is not compiled for other architectures.
 /**
  * Calculates CRC-32C for the specified string/buffer using SSE 4.2 extensions
  */
@@ -64,6 +66,22 @@ Napi::Value sse42_crc(const Napi::CallbackInfo &info) {
     throw Napi::TypeError::New(env, "input is not a string/buffer!");
   }
 }
+#else
+/**
+ * Returns error as it should not be called on other architectures.
+ */
+Napi::Value sse42_crc(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+  throw Napi::TypeError::New(env, "SSE 4.2 CRC 32 not supported.");
+}
+
+/**
+ * Returns false as SSE 4.2 is not available on other architectures.
+ */
+bool sse42_is_available() {
+  return false;
+}
+#endif
 
 /**
  * Calculates CRC-32C for the specified string/buffer using table-lookups
