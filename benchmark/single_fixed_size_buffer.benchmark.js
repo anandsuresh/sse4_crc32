@@ -37,7 +37,13 @@ module.exports = {
   iterations: 10000,
   tests: [{
     title: 'Native SSE 4.2 CRC-32C',
-    fn: () => Crc32C.sse42_crc(TEST_BUFFER)
+    fn: () => {
+      if (Crc32C.hardware_support === true) {
+        return Crc32C.sse42_crc(TEST_BUFFER)
+      } else {
+        throw Error('Not supported')
+      }
+    }
   }, {
     title: 'Native Table-based CRC-32C',
     fn: () => Crc32C.table_crc(TEST_BUFFER)
